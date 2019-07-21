@@ -2,18 +2,20 @@
   <div id="app" class="row no-gutters">
     <div class="col-sm-5 col-md-4 shadow-sm h-sm-100">
       <nav class="nav flex-column nav-pills">
-        <span class="navbar-brand font-weight-bold" href="#">
+        <a class="navbar-brand font-weight-bold" @click="onSwitchFriendOn()">
           {{$t('FRIEND_LIST', {count: friends.length})}}
-        </span>
+        </a>
 
-        <router-link v-for="friend in friends" :key="friend.id" :to="`/chat/${friend.id}`" class="nav-link media">
-          <img :src="EmptyImg" class="mr-3 friend-img rounded-circle">
+        <div class="collapse friend-list" :class="{ show: isXsSize() ? friendOn : true }">
+          <router-link v-for="friend in friends" :key="friend.id" :to="`/chat/${friend.id}`" class="nav-link media">
+            <img :src="EmptyImg" class="mr-3 friend-img rounded-circle">
 
-          <div class="media-body">
-            <h5 class="mt-0 font-weight-bold">{{friend.name}}</h5>
-            {{friend.subject}}
-          </div>
-        </router-link>
+            <div class="media-body">
+              <h5 class="mt-0 font-weight-bold">{{friend.name}}</h5>
+              {{friend.subject}}
+            </div>
+          </router-link>
+        </div>
       </nav>
     </div>
 
@@ -23,13 +25,13 @@
           Cherri Chat
         </router-link>
 
-        <button class="navbar-toggler" type="button" data-toggle="collapse" :data-target="`#${navbarID}`" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler" type="button" @click="onSwitchNabar()">
           <span class="navbar-toggler-icon"></span>
         </button>
 
-        <div class="collapse navbar-collapse" :id="navbarID">
-          <ul class="language navbar-nav ml-auto">
-            <li class="nav-item rounded-pill border border-white px-3 mr-md-1" :class="{ active: language === 'zh-tw' }">
+        <div class="collapse navbar-collapse header" :class="{ show: navbarOn }">
+          <ul class="language navbar-nav ml-md-auto">
+            <li class="nav-item rounded-pill border border-white px-3 mr-1" :class="{ active: language === 'zh-tw' }">
               <a class="nav-link py-1" @click="setLocaleMessages('zh-tw')">中文</a>
             </li>
 
@@ -38,21 +40,20 @@
             </li>
           </ul>
 
-          <form class="user-info form-inline border-left border-white ml-md-3 px-md-3 text-white">
+          <form class="user-info form-inline ml-3 px-3 text-white">
             <img :src="EmptyImg" class="user-img rounded-circle mr-2" />
             {{userName}}
           </form>
         </div>
       </nav>
 
-      <router-view/>
+      <router-view v-if="isXsSize() ? viewOn : true" />
     </div>
   </div>
 </template>
 
 <script lang="ts">
   import { Component, Vue } from 'vue-property-decorator';
-  import UUID from 'uuid/v4';
   import VuexStore from '@/services/store';
   import Router from '@/router';
 
@@ -60,6 +61,11 @@
   import { ILoginInfo, IFriend } from '@/services/models/exam.data';
 
   import EmptyImg from '@/assets/imgs/empty.jpg';
+
+  import $ from 'jquery';
+  import 'popper.js';
+  import 'hammerjs';
+  import 'bootstrap';
 
 
   @Component({
@@ -69,7 +75,11 @@
     }
   })
   export default class App extends Vue {
-    private navbarID: string = UUID();
+    private friendOn: boolean = true;
+    private viewOn: boolean = false;
+    private navbarOn: boolean = false;
+
+    private mainWidth: number = document.body.clientWidth;
 
     get state(): ILoginInfo {
       return (VuexStore.state as { ExamData: ILoginInfo }).ExamData;
@@ -90,6 +100,27 @@
 
     get language(): string {
       return i18n.locale;
+    }
+
+    mounted(): void {
+      this.mainWidth = document.body.clientWidth;
+
+      $(window).off('resize').on('resize', () => this.mainWidth = document.body.clientWidth);
+    }
+
+    private isXsSize(): boolean {
+      return this.mainWidth < 576;
+    }
+
+    private onSwitchNabar(): void {
+      this.navbarOn = !this.navbarOn;
+      this.onSwitchFriendOn(false);
+    }
+
+    private onSwitchFriendOn(on: boolean = !this.friendOn): void {
+      this.friendOn = this.isXsSize() ? on : this.friendOn;
+      this.viewOn = this.isXsSize() ? !this.friendOn : this.viewOn;
+      this.navbarOn = this.isXsSize() && this.friendOn ? false : this.navbarOn;
     }
   }
 </script>
@@ -112,20 +143,30 @@
     }
 
     nav.nav.nav-pills {
-      & > * {
+      @media (max-width: 575px) {
+        div.collapse.friend-list {
+          height: calc(100vh - 112px);
+          overflow-y: auto;
+        }
+      }
+
+      & > a.navbar-brand, & > div.collapse > a.nav-link {
         border-bottom: 1px solid #4A90E2;
         margin: 0;
         border-radius: 0;
         padding: .5rem 1rem;
       }
 
-      span.navbar-brand {
+      a.navbar-brand {
+        cursor: pointer;
         padding-top: .8125rem;
         padding-bottom: .8125rem;
         margin-top: -1px;
       }
 
       a.nav-link {
+        background-color: inherit !important;
+
         &.router-link-active {
           color: white !important;
           background-color: #4A90E2 !important;
@@ -149,7 +190,7 @@
     nav.header-bar {
       background-color: #4A90E2 !important;
 
-      ul.language{
+      ul.language {
         flex-direction: row !important;
 
         & > li {
@@ -168,22 +209,32 @@
         }
       }
 
-      @media (max-width: 767px) {
-        ul.language > li {
-          margin-top: 2px;
-        }
-
-        form.user-info {
-          margin-top: .5rem;
-          border-left: 0 !important;
-        }
-      }
-
       @media (min-width: 768px) {
         form.user-info {
           margin-top: -.5rem;
           margin-bottom: -.5rem;
           height: 56px;
+          border-left: 1px solid white;
+        }
+      }
+
+      @media (max-width: 767px) {
+        div.navbar-collapse.header {
+          display: flex !important;
+          margin-top: .5rem;
+
+          &:not(.show) {
+            display: none !important;
+          }
+
+          ul.language {
+            display: inline-flex;
+            margin-right: auto;
+          }
+
+          form.user-info {
+            display: inline-block;
+          }
         }
       }
 

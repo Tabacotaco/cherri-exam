@@ -1,8 +1,8 @@
 <template>
   <div class="home container">
     <div class="row justify-content-center">
-      <div class="col-8 mt-5 text-center">
-        <img :src="DefaultImg" class="img-thumbnail border-0" />
+      <div class="col-12 col-sm-8 mt-5 text-center">
+        <img :src="DefaultImg" class="img-thumbnail border-0 px-5 px-sm-0" />
         <h4 class="font-weight-bold">{{$t('WELCOME_TO_CHAT')}}</h4>
       </div>
     </div>

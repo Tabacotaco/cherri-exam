@@ -1,5 +1,5 @@
 <template>
-  <div class="note-popover dropdown-menu dropdown-menu-right p-0">
+  <div class="note-popover dropdown-menu dropdown-menu-right p-0" :class="{ show }">
     <div class="arrow" />
 
     <ul class="list-group border-0 px-1">
@@ -48,6 +48,8 @@
   @Component({})
   export default class NotePopover extends Vue {
 
+    @Prop({ default: false })
+    private show!: boolean;
   }
 </script>
 

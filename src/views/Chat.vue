@@ -1,20 +1,14 @@
 <template>
   <div class="chat">
-    <nav class="header-chat navbar navbar-expand-sm shadow-sm">
+    <nav class="header-chat navbar navbar-expand shadow-sm">
       <span class="navbar-brand mr-auto">
         <img :src="EmptyImg" class="mr-1 friend-img rounded-circle">
         {{friend.name}}
       </span>
 
-      <button class="navbar-toggler" type="button" :data-target="`#${navbarID}`" data-toggle="collapse"
-        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-
-        <span class="navbar-toggler-icon"></span>
-      </button>
-
-      <div class="collapse navbar-collapse" :id="navbarID">
+      <div class="navbar-collapse">
         <form class="control-btns form-inline ml-auto">
-          <button type="button" class="btn rounded-circle mr-2" v-bs-collapse="{ id: searchID, isToggle: true }"
+          <button type="button" class="btn rounded-circle mr-2" @click="onSwitchSearchOn()"
             :class="{
               'btn-light border': searchOn,
               'btn-link border-0': !searchOn
@@ -24,22 +18,20 @@
           </button>
 
           <div ref="dropdown" class="dropdown">
-            <button type="button" class="btn rounded-circle" :id="noteID" data-toggle="dropdown"
-              aria-haspopup="true" aria-expanded="false" :class="{
-                'btn-light border': noteOn,
-                'btn-link border-0': !noteOn
-              }">
-
+            <button type="button" class="btn rounded-circle" @click="onDropdownExpanded()" :class="{
+              'btn-light border': noteOn,
+              'btn-link border-0': !noteOn
+            }">
               <img :src="NoteBtn" class="rounded-circle" />
             </button>
 
-            <NotePopover :aria-labelledby="noteID" />
+            <NotePopover :show="noteOn" />
           </div>
         </form>
       </div>
     </nav>
 
-    <div class="modal-header p-0" v-bs-collapse="{ id: searchID, isExpanded: searchOn }">
+    <div class="modal-header collapse p-0" :class="{ show: searchOn }">
       <div class="container mt-1">
         <div class="row">
           <input type="text" class="col form-control mr-auto" v-model="params" :placeholder="$t('PLACEHOLDER_SEARCH')"
@@ -49,7 +41,7 @@
             {{$t('SEARCH_RESULT', { count: searchResults.length })}}
           </span>
 
-          <button type="button" class="close-search-btn btn p-0 rounded-circle mr-1" @click="doCloseSearch()">
+          <button type="button" class="close-search-btn btn p-0 rounded-circle mr-1" @click="onSwitchSearchOn(false)">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
@@ -88,12 +80,10 @@
 
 <script lang="ts">
   import { Component, Vue, Prop } from 'vue-property-decorator';
-  import UUID from 'uuid/v4';
   import $ from 'jquery';
-  import VuexStore from '@/services/store';
-  
-  import BsCollapse from '@/directives/BsCollapse';
+
   import { ILoginInfo, IFriend, IMessage } from '@/services/models/exam.data';
+  import VuexStore from '@/services/store';
   import NotePopover from '@/views/components/NotePopover.vue';
 
   import EmptyImg from '@/assets/imgs/empty.jpg';
@@ -109,18 +99,11 @@
       NoteBtn: {default: () => NoteBtn},
       SentBtn: {default: () => SentBtn}
     },
-    directives: {
-      BsCollapse
-    },
     components: {
       NotePopover
     }
   })
   export default class Chat extends Vue {
-    private navbarID: string = UUID();
-    private searchID: string = UUID();
-    private noteID: string = UUID();
-
     private searchOn: boolean = false;
     private noteOn: boolean = false;
 
@@ -146,18 +129,38 @@
       return this.friend.messages;
     }
 
-    mounted(): void {
-      $(this.$refs.dropdown)
-        .on('show.bs.dropdown', () => this.noteOn = true)
-        .on('hidden.bs.dropdown', () => this.noteOn = false);
+    private onSwitchNoteOn(e: Event): void {
+      if (!$(this.$refs.dropdown as Element)[0].contains(e.target as Element)) {
+        this.noteOn = false;
+        document.body.removeEventListener('click', this.onSwitchNoteOn);
+      }
     }
 
-    doCloseSearch(): void {
-      ($(`#${this.searchID}`) as any).collapse('hide');
+    private onSwitchSearchOn(on?: boolean): void {
+      this.searchOn = on ? on : !this.searchOn;
+
+      if (!this.searchOn) {
+        this.params = '';
+        this.searchResults = [];
+
+        if (window.getSelection instanceof Function) {
+          const selection = window.getSelection();
+
+          if (selection)
+            selection.removeAllRanges();
+        }
+      }
     }
 
-    doSearch(): void {
-      if (window.getSelection) {
+    private onDropdownExpanded(): void {
+      this.noteOn = !this.noteOn;
+
+      if (this.noteOn)
+        document.body.addEventListener('click', this.onSwitchNoteOn);
+    }
+
+    private doSearch(): void {
+      if (window.getSelection instanceof Function) {
         const selection = window.getSelection();
 
         if (selection) {
@@ -233,7 +236,7 @@
       }
 
       &.modal-body {
-        height: calc(100vh - 216px);
+        height: calc(100vh - 225px);
         overflow-y: auto;
 
         span.rounded-pill {
