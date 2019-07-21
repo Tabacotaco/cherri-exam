@@ -1,0 +1,8 @@
+{
+  "FRIEND_LIST": "好友列表 ({count})",
+  "WELCOME_TO_CHAT": "開始使用 Cherri Chat",
+  "PLACEHOLDER_MESSAGE": "請輸入訊息",
+  "PLACEHOLDER_SEARCH": "搜尋",
+  "SEARCH_RESULT": "{count} 則相符訊息",
+  "ADD_MESSAGE": "新增"
+}

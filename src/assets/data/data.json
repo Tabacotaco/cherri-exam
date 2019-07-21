@@ -1,0 +1,56 @@
+{
+  "id": "JESSICA",
+  "userName": "潔西卡",
+  "friends": [{
+    "id": "PAUL",
+    "name": "保羅",
+    "subject": "大家好，我是保羅",
+    "messages": [{
+      "sender": "JESSICA",
+      "content": "保羅"
+    }, {
+      "sender": "JESSICA",
+      "content": "你好，我是潔西卡"
+    }, {
+      "sender": "JESSICA",
+      "content": "我喜歡吃的食物有"
+    }, {
+      "sender": "JESSICA",
+      "content": "各種巧克力口味的甜點"
+    }]
+  }, {
+    "id": "JACK",
+    "name": "傑克",
+    "subject": "大家好，我是傑克",
+    "messages": [{
+      "sender": "JESSICA",
+      "content": "傑克"
+    }, {
+      "sender": "JESSICA",
+      "content": "你好，我是潔西卡"
+    }, {
+      "sender": "JESSICA",
+      "content": "我喜歡做的運動為"
+    }, {
+      "sender": "JESSICA",
+      "content": "游泳，跑步"
+    }]
+  }, {
+    "id": "JACKSON",
+    "name": "傑森",
+    "subject": "大家好，我是傑森",
+    "messages": [{
+      "sender": "JESSICA",
+      "content": "傑森"
+    }, {
+      "sender": "JESSICA",
+      "content": "你好，我是潔西卡"
+    }, {
+      "sender": "JESSICA",
+      "content": "我喜歡的動物為"
+    }, {
+      "sender": "JESSICA",
+      "content": "貓，狗"
+    }]
+  }]
+}
