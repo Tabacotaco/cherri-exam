@@ -48,7 +48,7 @@
       </div>
     </div>
 
-    <div class="modal-body d-flex align-items-end">
+    <div class="modal-body">
       <div class="container">
         <div v-for="(msg, index) in messages" :key="index" class="row" :class="{
           'justify-content-end': userID === msg.sender,
@@ -238,6 +238,11 @@
       &.modal-body {
         height: calc(100vh - 225px);
         overflow-y: auto;
+
+        & > div.container {
+          position: sticky;
+          top: 100%;
+        }
 
         span.rounded-pill {
           border: 1px solid #4A90E2;
