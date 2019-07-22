@@ -7,7 +7,8 @@
         </a>
 
         <div class="collapse friend-list" :class="{ show: isXsSize() ? friendOn : true }">
-          <router-link v-for="friend in friends" :key="friend.id" :to="`/chat/${friend.id}`" class="nav-link media">
+          <router-link v-for="friend in friends" :key="friend.id" :to="`/chat/${friend.id}`" class="nav-link media"
+            @click.native="onSwitchFriendOn(false)">
             <img :src="EmptyImg" class="mr-3 friend-img rounded-circle">
 
             <div class="media-body">
